@@ -1,0 +1,872 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>A Journey of Gratitude | Happy Teachers' Day</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600&family=Plus+Jakarta+Sans:wght@300;400;600;800&family=Playfair+Display:ital,wght@0,600;1,400&display=swap" rel="stylesheet">
+  
+  <style>
+    :root {
+      --bg-dark: #05070f;
+      --accent-gold: #fbbf24;
+      --accent-cyan: #38bdf8;
+      --accent-purple: #a855f7;
+      --accent-pink: #f43f5e;
+      --text-main: #f8fafc;
+      --card-bg: rgba(15, 23, 42, 0.75);
+      --card-border: rgba(255, 255, 255, 0.15);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+    }
+
+    body, html {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background-color: var(--bg-dark);
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      color: var(--text-main);
+    }
+
+    /* Canvas Background */
+    #canvas-container {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 1;
+    }
+
+    /* Container Overlay */
+    .container {
+      position: relative;
+      z-index: 10;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+      pointer-events: none;
+    }
+
+    .scene {
+      position: absolute;
+      width: 100%;
+      max-width: 900px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(30px) scale(0.95);
+      transition: opacity 1.2s cubic-bezier(0.16, 1, 0.3, 1), transform 1.2s cubic-bezier(0.16, 1, 0.3, 1), filter 1.2s ease;
+      pointer-events: auto;
+    }
+
+    .scene.active {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0) scale(1);
+      filter: blur(0px);
+    }
+
+    /* Globe Transition Exit State */
+    .scene.dissolving {
+      opacity: 0;
+      transform: scale(1.15) translateY(-20px);
+      filter: blur(10px);
+      pointer-events: none;
+    }
+
+    /* Expanded Canvas Overlay for Scene 4 Globe */
+    .scene-globe-overlay {
+      max-width: 1000px;
+      margin-top: -30px;
+    }
+
+    /* Typography & Buttons */
+    .serif-quote {
+      font-family: 'Playfair Display', serif;
+      font-size: 2.6rem;
+      font-weight: 400;
+      line-height: 1.4;
+      letter-spacing: -0.5px;
+      text-shadow: 0 0 30px rgba(255, 255, 255, 0.2);
+    }
+
+    .btn {
+      background: linear-gradient(135deg, rgba(255,255,255,0.15), rgba(255,255,255,0.03));
+      border: 1px solid var(--card-border);
+      color: var(--text-main);
+      padding: 16px 40px;
+      border-radius: 50px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      cursor: pointer;
+      backdrop-filter: blur(20px);
+      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255,255,255,0.2);
+      margin-top: 30px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .btn:hover {
+      transform: translateY(-4px) scale(1.04);
+      border-color: var(--accent-gold);
+      box-shadow: 0 0 35px rgba(251, 191, 36, 0.45);
+      color: #fff;
+    }
+
+    .btn:active {
+      transform: translateY(1px) scale(0.98);
+    }
+
+    /* Icon styling */
+    .star-icon {
+      font-size: 4rem;
+      color: var(--accent-gold);
+      animation: floatPulse 3s infinite ease-in-out;
+      margin-bottom: 25px;
+      filter: drop-shadow(0 0 20px rgba(251, 191, 36, 0.7));
+    }
+
+    .intro-text-wrapper {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-bottom: 25px;
+    }
+
+    .line-1, .line-2 {
+      opacity: 0;
+      transform: translateY(20px);
+      animation: fadeInUp 1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    .line-1 {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 1.25rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 4px;
+      color: var(--accent-cyan);
+      text-shadow: 0 0 20px rgba(56, 189, 248, 0.5);
+      animation-delay: 0.3s;
+    }
+
+    .line-2 {
+      font-family: 'Playfair Display', serif;
+      font-size: 3.2rem;
+      font-weight: 600;
+      line-height: 1.3;
+      background: linear-gradient(120deg, #ffffff 0%, var(--accent-gold) 40%, var(--accent-pink) 70%, var(--accent-purple) 100%);
+      background-size: 200% auto;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      animation: fadeInUp 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards 0.9s, gradientShift 6s ease infinite;
+      text-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    }
+
+    .btn-hero {
+      opacity: 0;
+      transform: translateY(20px);
+      animation: fadeInUp 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards 1.7s;
+      background: linear-gradient(135deg, rgba(251, 191, 36, 0.2), rgba(168, 85, 247, 0.15));
+      border: 1px solid rgba(251, 191, 36, 0.4);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), 0 0 20px rgba(251, 191, 36, 0.2);
+    }
+
+    .btn-hero:hover {
+      background: linear-gradient(135deg, var(--accent-gold), var(--accent-pink));
+      border-color: transparent;
+      color: #05070f;
+      box-shadow: 0 0 40px rgba(251, 191, 36, 0.7);
+      font-weight: 700;
+    }
+
+    /* Scene 2 Classroom UI */
+    .classroom-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+      width: 100%;
+      margin-top: 30px;
+    }
+
+    .blackboard {
+      grid-column: span 3;
+      background: rgba(10, 20, 28, 0.88);
+      border: 2px solid rgba(56, 189, 248, 0.25);
+      border-radius: 20px;
+      padding: 35px 30px;
+      min-height: 190px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.7), inset 0 0 35px rgba(56, 189, 248, 0.08);
+      backdrop-filter: blur(15px);
+      position: relative;
+    }
+
+    .memory-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.6rem;
+      color: #7dd3fc;
+      margin-bottom: 15px;
+      font-weight: 600;
+      text-shadow: 0 0 15px rgba(127, 112, 226, 0.4);
+    }
+
+    .memory-text {
+      font-size: 1.1rem;
+      line-height: 1.7;
+      color: #e2e8f0;
+      font-weight: 300;
+    }
+
+    .interactive-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 20px;
+      padding: 25px 15px;
+      cursor: pointer;
+      backdrop-filter: blur(15px);
+      transition: all 0.4s ease;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+    }
+
+    .interactive-card:hover {
+      transform: translateY(-10px);
+      background: rgba(255, 255, 255, 0.08);
+      border-color: var(--accent-gold);
+      box-shadow: 0 15px 35px rgba(251, 191, 36, 0.25);
+    }
+
+    .interactive-card.discovered {
+      border-color: var(--accent-cyan);
+      opacity: 0.45;
+      transform: scale(0.95);
+      pointer-events: none;
+    }
+
+    .card-icon {
+      font-size: 3.2rem;
+      margin-bottom: 10px;
+      transition: transform 0.3s ease;
+      filter: drop-shadow(0 0 10px rgba(255,255,255,0.2));
+    }
+
+    .interactive-card:hover .card-icon {
+      transform: scale(1.15) rotate(5deg);
+    }
+
+    /* Scene 5 Terminal */
+    .terminal-card {
+      background: rgba(15, 23, 42, 0.9);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 16px;
+      width: 100%;
+      max-width: 480px;
+      overflow: hidden;
+      box-shadow: 0 25px 50px rgba(0,0,0,0.7);
+      backdrop-filter: blur(20px);
+    }
+
+    .terminal-header {
+      background: rgba(30, 41, 59, 0.85);
+      padding: 12px 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+    }
+
+    .dot { width: 12px; height: 12px; border-radius: 50%; }
+    .dot-red { background: #ef4444; }
+    .dot-yellow { background: #f59e0b; }
+    .dot-green { background: #10b981; }
+
+    .terminal-body {
+      padding: 25px;
+      font-family: 'Fira Code', monospace;
+      text-align: left;
+    }
+
+    .checklist-item {
+      display: flex;
+      justify-content: space-between;
+      margin: 14px 0;
+      color: #e2e8f0;
+      font-size: 1.05rem;
+      opacity: 0;
+      transform: translateX(-10px);
+      transition: all 0.5s ease;
+    }
+
+    .checklist-item.visible {
+      opacity: 1;
+      transform: translateX(0);
+    }
+
+    .checklist-item span.check {
+      color: var(--accent-cyan);
+      font-weight: bold;
+    }
+
+    /* Scene 6 Finale */
+    .final-title {
+      font-size: 5rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, #fbbf24 0%, #f43f5e 50%, #a855f7 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      letter-spacing: 4px;
+      margin-bottom: 10px;
+      filter: drop-shadow(0 0 30px rgba(251, 191, 36, 0.35));
+    }
+
+    .final-subtitle {
+      font-size: 3rem;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 25px;
+      letter-spacing: 2px;
+    }
+
+    .final-message {
+      font-size: 1.35rem;
+      line-height: 1.9;
+      font-weight: 300;
+      color: #cbd5e1;
+      max-width: 680px;
+    }
+
+    .badge {
+      font-size: 0.85rem;
+      background: rgba(168, 85, 247, 0.2);
+      border: 1px solid rgba(168, 85, 247, 0.4);
+      color: #d8b4fe;
+      padding: 6px 18px;
+      border-radius: 20px;
+      margin-top: 25px;
+      display: inline-block;
+      letter-spacing: 1px;
+    }
+
+    @keyframes floatPulse {
+      0%, 100% { transform: translateY(0) scale(1); opacity: 0.8; }
+      50% { transform: translateY(-10px) scale(1.1); opacity: 1; }
+    }
+
+    @keyframes fadeInUp {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes gradientShift {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    @media (max-width: 650px) {
+      .line-2 { font-size: 2.2rem; }
+      .line-1 { font-size: 1rem; }
+      .classroom-grid { grid-template-columns: 1fr; }
+      .blackboard { grid-column: span 1; }
+      .final-title { font-size: 3rem; }
+      .final-subtitle { font-size: 2rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <div id="canvas-container">
+    <canvas id="particle-canvas"></canvas>
+  </div>
+
+  <div class="container">
+    
+    <!-- Scene 1: Beginning -->
+    <div class="scene active" id="scene-1">
+      <div class="star-icon">✦</div>
+      
+      <div class="intro-text-wrapper">
+        <span class="line-1">A Journey of Gratitude</span>
+        <h1 class="line-2">Every great story<br>begins with a teacher.</h1>
+      </div>
+
+      <button class="btn btn-hero" onclick="goToScene(2)">
+        Begin the Journey →
+      </button>
+    </div>
+
+    <!-- Scene 2: Classroom Discovery -->
+    <div class="scene" id="scene-2">
+      <div class="blackboard">
+        <div id="message-box">
+          <p class="memory-text" style="color: #7dd3fc; font-family: 'Fira Code', monospace;">Click the artifacts below to explore the classroom...</p>
+        </div>
+      </div>
+
+      <div class="classroom-grid">
+        <div class="interactive-card" id="card-book">
+          <div class="card-icon">📖</div>
+          <h3>Book</h3>
+        </div>
+        <div class="interactive-card" id="card-lamp">
+          <div class="card-icon">💡</div>
+          <h3>Lamp</h3>
+        </div>
+        <div class="interactive-card" id="card-laptop">
+          <div class="card-icon">💻</div>
+          <h3>Laptop</h3>
+        </div>
+      </div>
+
+      <div class="badge" id="discovery-counter">0 OF 3 LESSONS UNLOCKED</div>
+    </div>
+
+    <!-- Scene 3: The Revelation -->
+    <div class="scene" id="scene-3">
+      <div class="star-icon">🧑‍🏫</div>
+      <h2 class="serif-quote" id="scene3-text-1">"Behind every lesson..."</h2>
+      <h2 class="serif-quote" id="scene3-text-2" style="display: none; color: var(--accent-gold); margin-top: 15px;">
+        "...there is someone who believed in us."
+      </h2>
+      <h1 class="serif-quote" id="scene3-text-3" style="display: none; font-weight: 800; font-size: 3.8rem; margin-top: 25px; color: #fff;">
+        YOU. ❤️
+      </h1>
+      <button class="btn" id="scene3-btn" style="display: none;" onclick="goToScene(4)">Step Into the Future →</button>
+    </div>
+
+    <!-- Scene 4: 3D Particle Globe -->
+    <div class="scene scene-globe-overlay" id="scene-4">
+      <h2 class="serif-quote" style="margin-bottom: 10px;">The Sphere of Growth</h2>
+      <p style="color: #94a3b8; font-size: 1.15rem; margin-bottom: 25px;">Click to ignite the transformation of knowledge into innovation.</p>
+      <button class="btn" id="transform-btn" onclick="transformGlobe()">Ignite Transformation ⚡</button>
+    </div>
+
+    <!-- Scene 5: Engineering Blueprint -->
+    <div class="scene" id="scene-5">
+      <div class="terminal-card">
+        <div class="terminal-header">
+          <div class="dot dot-red"></div>
+          <div class="dot dot-yellow"></div>
+          <div class="dot dot-green"></div>
+          <span style="font-size: 0.85rem; color: #94a3b8; font-family: 'Fira Code', monospace; margin-left: 10px;">ENGINEER_MINDSET.EXE</span>
+        </div>
+        <div class="terminal-body">
+          <div class="checklist-item" id="chk-1"><span>Curiosity</span><span class="check">✓ READY</span></div>
+          <div class="checklist-item" id="chk-2"><span>Knowledge</span><span class="check">✓ INSTALLED</span></div>
+          <div class="checklist-item" id="chk-3"><span>Creativity</span><span class="check">✓ ACTIVATED</span></div>
+          <div class="checklist-item" id="chk-4"><span>Confidence</span><span class="check">✓ EMPOWERED</span></div>
+        </div>
+      </div>
+      <h2 class="serif-quote" style="margin-top: 35px; font-size: 2rem; color: #f8fafc;">"You didn't just teach us facts. You are helping us to become engineers."</h2>
+      <button class="btn" onclick="goToScene(6)">One Last Thing... ✨</button>
+    </div>
+
+    <!-- Scene 6: Grand Finale -->
+    <div class="scene" id="scene-6">
+      <h1 class="final-title">THANK YOU</h1>
+      <h2 class="final-subtitle">TEACHERS</h2>
+      <h3 style="color: var(--accent-gold); margin-bottom: 25px; font-size: 2rem; letter-spacing: 1px;">🎉 HAPPY TEACHERS' DAY</h3>
+      <p class="final-message">
+        You didn't just teach us subjects.<br>
+        You taught us how to think, how to create, and how to believe in ourselves.<br>
+        Every code we write, every solution we engineer, carries your inspiration.
+      </p>
+      <div style="margin-top: 45px; color: var(--accent-pink); font-size: 1.25rem; font-weight: 600;">
+        With Heartfelt Gratitude ❤️<br>
+        <span style="color: #94a3b8; font-weight: 400; font-size: 1rem; margin-top: 5px; display: inline-block;">From Your Student (Rushitha)</span>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    /* --- Audio Synthesizer --- */
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    
+    function playSound(freq, type = 'sine', duration = 0.3, vol = 0.1) {
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = type;
+      osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+      gain.gain.setValueAtTime(vol, audioCtx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + duration);
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      osc.start();
+      osc.stop(audioCtx.currentTime + duration);
+    }
+
+    function playRampSweep() {
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(200, audioCtx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(880, audioCtx.currentTime + 1.8);
+      gain.gain.setValueAtTime(0.05, audioCtx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 2.0);
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      osc.start();
+      osc.stop(audioCtx.currentTime + 2.0);
+    }
+
+    function playHarmonicChord() {
+      const notes = [261.63, 329.63, 392.00, 523.25];
+      notes.forEach((freq, idx) => {
+        setTimeout(() => playSound(freq, 'sine', 1.2, 0.08), idx * 120);
+      });
+    }
+
+    /* --- Particle Canvas Engine --- */
+    const canvas = document.getElementById('particle-canvas');
+    const ctx = canvas.getContext('2d');
+    let width, height;
+
+    function resize() {
+      width = canvas.width = window.innerWidth;
+      height = canvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resize);
+    resize();
+
+    class CosmicParticle {
+      constructor() {
+        this.reset();
+      }
+
+      reset() {
+        this.x = Math.random() * width;
+        this.y = Math.random() * height;
+        this.vx = (Math.random() - 0.5) * 0.4;
+        this.vy = (Math.random() - 0.5) * 0.4;
+        this.radius = Math.random() * 2 + 0.5;
+        this.alpha = Math.random() * 0.6 + 0.1;
+        this.color = ['#fbbf24', '#38bdf8', '#a855f7', '#ffffff'][Math.floor(Math.random() * 4)];
+      }
+
+      update() {
+        this.x += this.vx;
+        this.y += this.vy;
+
+        if (this.x < 0 || this.x > width) this.vx *= -1;
+        if (this.y < 0 || this.y > height) this.vy *= -1;
+      }
+
+      draw() {
+        ctx.save();
+        ctx.globalAlpha = this.alpha;
+        ctx.fillStyle = this.color;
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      }
+    }
+
+    class SphereParticle {
+      constructor() {
+        this.theta = Math.random() * Math.PI * 2;
+        this.phi = Math.acos((Math.random() * 2) - 1);
+        this.implodeMult = 1;
+      }
+
+      rotateAndDraw(angleX, angleY, centerX, centerY, radius) {
+        let currentRadius = radius * this.implodeMult;
+        let baseX = currentRadius * Math.sin(this.phi) * Math.cos(this.theta);
+        let baseY = currentRadius * Math.sin(this.phi) * Math.sin(this.theta);
+        let baseZ = currentRadius * Math.cos(this.phi);
+
+        // Y Axis Rotation
+        let cosY = Math.cos(angleY), sinY = Math.sin(angleY);
+        let x1 = baseX * cosY - baseZ * sinY;
+        let z1 = baseX * sinY + baseZ * cosY;
+
+        // X Axis Rotation
+        let cosX = Math.cos(angleX), sinX = Math.sin(angleX);
+        let y1 = baseY * cosX - z1 * sinX;
+        let z2 = baseY * sinX + z1 * cosX;
+
+        const fov = 500;
+        const scale = fov / (fov + z2 + 400);
+        const x2d = x1 * scale + centerX;
+        const y2d = y1 * scale + centerY;
+        const alpha = Math.max(0.12, (z2 + radius) / (radius * 2));
+
+        ctx.save();
+        ctx.globalAlpha = alpha;
+        ctx.fillStyle = '#fbbf24';
+        ctx.beginPath();
+        ctx.arc(x2d, y2d, Math.max(0.8, 3 * scale), 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      }
+    }
+
+    let particles = Array.from({ length: 90 }, () => new CosmicParticle());
+    let sphereParticles = Array.from({ length: 350 }, () => new SphereParticle());
+    
+    let mode = 'ambient'; 
+    let angleX = 0, angleY = 0;
+    let rotationSpeedX = 0.004, rotationSpeedY = 0.007;
+    let globeOpacity = 1;
+    const words = ["LEARN", "EXPLORE", "QUESTION", "CREATE", "BUILD"];
+
+    function triggerBurst() {
+      mode = 'burst';
+      particles.forEach(p => {
+        p.vx = (Math.random() - 0.5) * 16;
+        p.vy = (Math.random() - 0.5) * 16;
+        p.alpha = 1;
+        p.radius = Math.random() * 4 + 2;
+      });
+      setTimeout(() => { mode = 'ambient'; }, 2000);
+    }
+
+    function renderCanvas() {
+      ctx.clearRect(0, 0, width, height);
+
+      if (mode === 'ambient' || mode === 'burst') {
+        particles.forEach(p => {
+          p.update();
+          p.draw();
+        });
+      } else if (mode === 'globe' || mode === 'transitioning') {
+        angleX += rotationSpeedX;
+        angleY += rotationSpeedY;
+
+        const centerX = width / 2;
+        const centerY = height / 2;
+        const globeRadius = Math.min(width, height) * 0.35;
+
+        // Render Outer Orbit Rings
+        ctx.save();
+        ctx.globalAlpha = globeOpacity;
+        ctx.strokeStyle = 'rgba(56, 189, 248, 0.15)';
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.arc(centerX, centerY, globeRadius * 1.35, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.restore();
+
+        // Render Globe Particles
+        sphereParticles.forEach(p => {
+          p.rotateAndDraw(angleX, angleY, centerX, centerY, globeRadius);
+        });
+
+        // Orbiting Keywords
+        if (mode === 'globe') {
+          words.forEach((word, index) => {
+            const orbitAngle = angleY + (index * (Math.PI * 2 / words.length));
+            const rad = globeRadius * 1.45;
+            const x3d = Math.cos(orbitAngle) * rad;
+            const z3d = Math.sin(orbitAngle) * rad;
+            const y3d = Math.sin(orbitAngle * 0.5) * 60;
+
+            const fov = 500;
+            const scale = fov / (fov + z3d + 400);
+            const x2d = x3d * scale + centerX;
+            const y2d = y3d * scale + centerY;
+
+            ctx.save();
+            ctx.font = `700 ${Math.max(14, 22 * scale)}px "Fira Code", monospace`;
+            ctx.fillStyle = `rgba(56, 189, 248, ${Math.max(0.3, (z3d + rad) / (rad * 2))})`;
+            ctx.textAlign = 'center';
+            ctx.fillText(word, x2d, y2d);
+            ctx.restore();
+          });
+        }
+      }
+
+      requestAnimationFrame(renderCanvas);
+    }
+    renderCanvas();
+
+    /* --- Interactive Story Logic --- */
+    let currentScene = 1;
+    let discoveredCount = 0;
+    const discoveredState = { book: false, lamp: false, laptop: false };
+
+    const book = document.getElementById("card-book");
+    const lamp = document.getElementById("card-lamp");
+    const laptop = document.getElementById("card-laptop");
+    const messageBox = document.getElementById("message-box");
+
+    function checkAllDiscovered() {
+      discoveredCount++;
+      document.getElementById('discovery-counter').innerText = `${discoveredCount} OF 3 LESSONS UNLOCKED`;
+      if (discoveredCount === 3) {
+        setTimeout(() => { goToScene(3); }, 3500);
+      }
+    }
+
+    book.addEventListener("click", () => {
+      if (discoveredState.book) return;
+      discoveredState.book = true;
+      book.classList.add('discovered');
+      playSound(450, 'triangle', 0.25);
+
+      messageBox.innerHTML = `
+        <div class="memory-title">📖 Lessons Beyond the Syllabus</div>
+        <div class="memory-text">
+            Every page we opened contained more than facts.
+            <br>
+            You taught us curiosity, discipline, and the courage to ask questions.
+            <br>
+            The lessons we remember most were never written in textbooks.
+        </div>
+      `;
+      checkAllDiscovered();
+    });
+
+    lamp.addEventListener("click", () => {
+      if (discoveredState.lamp) return;
+      discoveredState.lamp = true;
+      lamp.classList.add('discovered');
+      playSound(600, 'triangle', 0.25);
+
+      messageBox.innerHTML = `
+        <div class="memory-title">💡 A Light in Every Doubt</div>
+        <div class="memory-text">
+            There were moments when the path seemed unclear.
+            <br>
+            Yet every explanation, every encouragement, and every extra effort
+            <br>
+            turned confusion into confidence and uncertainty into direction.
+        </div>
+      `;
+      checkAllDiscovered();
+    });
+
+    laptop.addEventListener("click", () => {
+      if (discoveredState.laptop) return;
+      discoveredState.laptop = true;
+      laptop.classList.add('discovered');
+      playSound(750, 'triangle', 0.25);
+
+      messageBox.innerHTML = `
+        <div class="memory-title">💻 Building the Future</div>
+        <div class="memory-text">
+            You didn't just teach us how technology works.
+            <br>
+            You taught us how to think, how to create, and how to build.
+            <br>
+            The future we dream of today is built on the foundation you gave us.
+        </div>
+      `;
+      checkAllDiscovered();
+    });
+
+    function goToScene(sceneNumber) {
+      playSound(523.25, 'sine', 0.2, 0.05);
+      document.getElementById(`scene-${currentScene}`).classList.remove('active');
+      currentScene = sceneNumber;
+      
+      setTimeout(() => {
+        document.getElementById(`scene-${currentScene}`).classList.add('active');
+        if (currentScene === 3) handleScene3Sequence();
+        if (currentScene === 4) mode = 'globe';
+        if (currentScene === 5) handleScene5Terminal();
+        if (currentScene === 6) { triggerBurst(); playHarmonicChord(); }
+      }, 600);
+    }
+
+    function handleScene3Sequence() {
+      setTimeout(() => {
+        playSound(440, 'sine', 0.3, 0.08);
+        document.getElementById('scene3-text-2').style.display = 'block';
+      }, 1600);
+
+      setTimeout(() => {
+        playHarmonicChord();
+        document.getElementById('scene3-text-3').style.display = 'block';
+        document.getElementById('scene3-btn').style.display = 'inline-block';
+      }, 3400);
+    }
+
+    /* Cinematic Transition Handler: Globe -> Engineering Blueprint */
+    function transformGlobe() {
+      const transformBtn = document.getElementById('transform-btn');
+      transformBtn.style.pointerEvents = 'none';
+      
+      playRampSweep();
+      mode = 'transitioning';
+
+      // 1. Dissolve Scene 4 Text/UI smoothly
+      document.getElementById('scene-4').classList.add('dissolving');
+
+      // 2. Accelerate Globe Spin & Collapse Particles Into Core Singularity
+      let duration = 1500;
+      let startTime = null;
+
+      function animateTransition(timestamp) {
+        if (!startTime) startTime = timestamp;
+        let progress = (timestamp - startTime) / duration;
+
+        if (progress < 1) {
+          rotationSpeedX = 0.004 + progress * 0.08;
+          rotationSpeedY = 0.007 + progress * 0.12;
+          
+          // Implode particles inward
+          sphereParticles.forEach(p => {
+            p.implodeMult = 1 - (progress * 0.85);
+          });
+          globeOpacity = 1 - (progress * 0.5);
+
+          requestAnimationFrame(animateTransition);
+        } else {
+          // 3. Shockwave Burst & Transition to Scene 5
+          triggerBurst();
+          playHarmonicChord();
+
+          document.getElementById('scene-4').classList.remove('active', 'dissolving');
+          currentScene = 5;
+
+          setTimeout(() => {
+            document.getElementById('scene-5').classList.add('active');
+            handleScene5Terminal();
+          }, 300);
+        }
+      }
+
+      requestAnimationFrame(animateTransition);
+    }
+
+    function handleScene5Terminal() {
+      const items = ['chk-1', 'chk-2', 'chk-3', 'chk-4'];
+      items.forEach((id, index) => {
+        setTimeout(() => {
+          playSound(600 + (index * 100), 'sine', 0.15, 0.05);
+          document.getElementById(id).classList.add('visible');
+        }, (index + 1) * 600);
+      });
+    }
+  </script>
+</body>
+</html>
