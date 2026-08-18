@@ -57,7 +57,6 @@
       align-items: center;
       padding: 20px;
       pointer-events: none;
-      overflow-y: auto; /* Fallback for very small heights */
     }
 
     .scene {
@@ -254,7 +253,7 @@
     }
 
     .interactive-card:hover {
-      transform: translateY(-10px);
+      transform: translateY(-5px);
       background: rgba(255, 255, 255, 0.08);
       border-color: var(--accent-gold);
       box-shadow: 0 15px 35px rgba(251, 191, 36, 0.25);
@@ -272,10 +271,6 @@
       margin-bottom: 10px;
       transition: transform 0.3s ease;
       filter: drop-shadow(0 0 10px rgba(255,255,255,0.2));
-    }
-
-    .interactive-card:hover .card-icon {
-      transform: scale(1.15) rotate(5deg);
     }
 
     /* Scene 5 Terminal */
@@ -389,52 +384,70 @@
       100% { background-position: 0% 50%; }
     }
 
-    /* Mobile Responsive Optimizations */
+    /* --- MOBILE OPTIMIZATION OVERRIDES --- */
     @media (max-width: 650px) {
       .container {
-        padding: 15px 12px;
+        padding: 12px 10px;
       }
-      .line-2 { font-size: 2.2rem; }
-      .line-1 { font-size: 0.95rem; letter-spacing: 2px; }
+      .line-2 { font-size: 2rem; }
+      .line-1 { font-size: 0.85rem; letter-spacing: 2px; }
       
       .classroom-grid { 
-        grid-template-columns: repeat(3, 1fr); 
-        gap: 10px;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        margin-top: 12px;
       }
+      
       .blackboard { 
-        grid-column: span 3;
-        padding: 16px 14px;
-        min-height: 140px;
+        padding: 14px;
+        min-height: 120px;
       }
+      
       .memory-title {
-        font-size: 1.25rem;
-        margin-bottom: 8px;
+        font-size: 1.1rem;
+        margin-bottom: 6px;
       }
+      
       .memory-text {
-        font-size: 0.88rem;
-        line-height: 1.45;
-      }
-      .interactive-card {
-        padding: 12px 8px;
-        border-radius: 14px;
-      }
-      .card-icon {
-        font-size: 2rem;
-        margin-bottom: 4px;
-      }
-      .interactive-card h3 {
         font-size: 0.85rem;
+        line-height: 1.35;
       }
+      
+      .interactive-card {
+        flex-direction: row;
+        justify-content: center;
+        align-items: center;
+        gap: 12px;
+        padding: 8px 16px;
+        border-radius: 12px;
+      }
+      
+      .card-icon {
+        font-size: 1.4rem;
+        margin-bottom: 0;
+      }
+      
+      .interactive-card h3 {
+        font-size: 0.9rem;
+      }
+      
       .badge {
-        margin-top: 15px;
+        margin-top: 10px;
         font-size: 0.75rem;
-        padding: 5px 14px;
+        padding: 4px 12px;
       }
 
-      .serif-quote { font-size: 1.8rem; }
-      .final-title { font-size: 2.8rem; }
-      .final-subtitle { font-size: 1.8rem; }
-      .final-message { font-size: 1rem; line-height: 1.6; }
+      .btn {
+        padding: 12px 28px;
+        font-size: 0.95rem;
+        margin-top: 18px;
+      }
+
+      .serif-quote { font-size: 1.6rem; }
+      .final-title { font-size: 2.5rem; }
+      .final-subtitle { font-size: 1.5rem; }
+      .final-message { font-size: 0.95rem; line-height: 1.5; }
     }
   </style>
 </head>
@@ -464,7 +477,7 @@
     <div class="scene" id="scene-2">
       <div class="blackboard">
         <div id="message-box">
-          <p class="memory-text" style="color: #7dd3fc; font-family: 'Fira Code', monospace;">Click the artifacts below to explore the classroom...</p>
+          <p class="memory-text" style="color: #7dd3fc; font-family: 'Fira Code', monospace;">Click the artifacts below to explore...</p>
         </div>
       </div>
 
@@ -493,7 +506,7 @@
       <h2 class="serif-quote" id="scene3-text-2" style="display: none; color: var(--accent-gold); margin-top: 15px;">
         "...there is someone who believed in us."
       </h2>
-      <h1 class="serif-quote" id="scene3-text-3" style="display: none; font-weight: 800; font-size: 3.8rem; margin-top: 25px; color: #fff;">
+      <h1 class="serif-quote" id="scene3-text-3" style="display: none; font-weight: 800; font-size: 3.5rem; margin-top: 20px; color: #fff;">
         YOU. ❤️
       </h1>
       <button class="btn" id="scene3-btn" style="display: none;" onclick="goToScene(4)">Step Into the Future →</button>
@@ -502,7 +515,7 @@
     <!-- Scene 4: 3D Particle Globe -->
     <div class="scene scene-globe-overlay" id="scene-4">
       <h2 class="serif-quote" style="margin-bottom: 10px;">The Sphere of Growth</h2>
-      <p style="color: #94a3b8; font-size: 1.15rem; margin-bottom: 25px;">Click to ignite the transformation of knowledge into innovation.</p>
+      <p style="color: #94a3b8; font-size: 1rem; margin-bottom: 20px;">Click to ignite the transformation of knowledge into innovation.</p>
       <button class="btn" id="transform-btn" onclick="transformGlobe()">Ignite Transformation ⚡</button>
     </div>
 
@@ -522,7 +535,7 @@
           <div class="checklist-item" id="chk-4"><span>Confidence</span><span class="check">✓ EMPOWERED</span></div>
         </div>
       </div>
-      <h2 class="serif-quote" style="margin-top: 35px; font-size: 2rem; color: #f8fafc;">"You didn't just teach us facts. You are helping us to become engineers."</h2>
+      <h2 class="serif-quote" style="margin-top: 25px; font-size: 1.6rem; color: #f8fafc;">"You didn't just teach us facts. You are helping us to become engineers."</h2>
       <button class="btn" onclick="goToScene(6)">One Last Thing... ✨</button>
     </div>
 
@@ -530,15 +543,15 @@
     <div class="scene" id="scene-6">
       <h1 class="final-title">THANK YOU</h1>
       <h2 class="final-subtitle">TEACHERS</h2>
-      <h3 style="color: var(--accent-gold); margin-bottom: 25px; font-size: 2rem; letter-spacing: 1px;">🎉 HAPPY TEACHERS' DAY</h3>
+      <h3 style="color: var(--accent-gold); margin-bottom: 15px; font-size: 1.6rem; letter-spacing: 1px;">🎉 HAPPY TEACHERS' DAY</h3>
       <p class="final-message">
         You didn't just teach us subjects.<br>
-        You taught us how to think, how to create, and how to believe in ourselves.<br>
-        Every code we write, every solution we engineer, carries your inspiration.
+        You taught us how to think, create, and believe in ourselves.<br>
+        Every code we write carries your inspiration.
       </p>
-      <div style="margin-top: 45px; color: var(--accent-pink); font-size: 1.25rem; font-weight: 600;">
+      <div style="margin-top: 30px; color: var(--accent-pink); font-size: 1.1rem; font-weight: 600;">
         With Heartfelt Gratitude ❤️<br>
-        <span style="color: #94a3b8; font-weight: 400; font-size: 1rem; margin-top: 5px; display: inline-block;">From Your Student (Rushitha)</span>
+        <span style="color: #94a3b8; font-weight: 400; font-size: 0.9rem; margin-top: 5px; display: inline-block;">From Your Student (Rushitha)</span>
       </div>
     </div>
 
@@ -643,12 +656,10 @@
         let baseY = currentRadius * Math.sin(this.phi) * Math.sin(this.theta);
         let baseZ = currentRadius * Math.cos(this.phi);
 
-        // Y Axis Rotation
         let cosY = Math.cos(angleY), sinY = Math.sin(angleY);
         let x1 = baseX * cosY - baseZ * sinY;
         let z1 = baseX * sinY + baseZ * cosY;
 
-        // X Axis Rotation
         let cosX = Math.cos(angleX), sinX = Math.sin(angleX);
         let y1 = baseY * cosX - z1 * sinX;
         let z2 = baseY * sinX + z1 * cosX;
@@ -703,9 +714,8 @@
 
         const centerX = width / 2;
         const centerY = height / 2;
-        const globeRadius = Math.min(width, height) * 0.35;
+        const globeRadius = Math.min(width, height) * 0.3;
 
-        // Render Outer Orbit Rings
         ctx.save();
         ctx.globalAlpha = globeOpacity;
         ctx.strokeStyle = 'rgba(56, 189, 248, 0.15)';
@@ -715,19 +725,17 @@
         ctx.stroke();
         ctx.restore();
 
-        // Render Globe Particles
         sphereParticles.forEach(p => {
           p.rotateAndDraw(angleX, angleY, centerX, centerY, globeRadius);
         });
 
-        // Orbiting Keywords
         if (mode === 'globe') {
           words.forEach((word, index) => {
             const orbitAngle = angleY + (index * (Math.PI * 2 / words.length));
             const rad = globeRadius * 1.45;
             const x3d = Math.cos(orbitAngle) * rad;
             const z3d = Math.sin(orbitAngle) * rad;
-            const y3d = Math.sin(orbitAngle * 0.5) * 60;
+            const y3d = Math.sin(orbitAngle * 0.5) * 40;
 
             const fov = 500;
             const scale = fov / (fov + z3d + 400);
@@ -735,7 +743,7 @@
             const y2d = y3d * scale + centerY;
 
             ctx.save();
-            ctx.font = `700 ${Math.max(12, 20 * scale)}px "Fira Code", monospace`;
+            ctx.font = `700 ${Math.max(11, 18 * scale)}px "Fira Code", monospace`;
             ctx.fillStyle = `rgba(56, 189, 248, ${Math.max(0.3, (z3d + rad) / (rad * 2))})`;
             ctx.textAlign = 'center';
             ctx.fillText(word, x2d, y2d);
@@ -762,7 +770,7 @@
       discoveredCount++;
       document.getElementById('discovery-counter').innerText = `${discoveredCount} OF 3 LESSONS UNLOCKED`;
       if (discoveredCount === 3) {
-        setTimeout(() => { goToScene(3); }, 3500);
+        setTimeout(() => { goToScene(3); }, 3200);
       }
     }
 
@@ -773,7 +781,7 @@
       playSound(450, 'triangle', 0.25);
 
       messageBox.innerHTML = `
-        <div class="memory-title">📖 Lessons Beyond the Syllabus</div>
+        <div class="memory-title">📖 Lessons Beyond Books</div>
         <div class="memory-text">
             Every page contained more than facts. You taught us curiosity, discipline, and the courage to ask questions.
         </div>
@@ -838,7 +846,6 @@
       }, 3400);
     }
 
-    /* Cinematic Transition Handler: Globe -> Engineering Blueprint */
     function transformGlobe() {
       const transformBtn = document.getElementById('transform-btn');
       transformBtn.style.pointerEvents = 'none';
@@ -846,10 +853,8 @@
       playRampSweep();
       mode = 'transitioning';
 
-      // 1. Dissolve Scene 4 Text/UI smoothly
       document.getElementById('scene-4').classList.add('dissolving');
 
-      // 2. Accelerate Globe Spin & Collapse Particles Into Core Singularity
       let duration = 1500;
       let startTime = null;
 
@@ -861,7 +866,6 @@
           rotationSpeedX = 0.004 + progress * 0.08;
           rotationSpeedY = 0.007 + progress * 0.12;
           
-          // Implode particles inward
           sphereParticles.forEach(p => {
             p.implodeMult = 1 - (progress * 0.85);
           });
@@ -869,7 +873,6 @@
 
           requestAnimationFrame(animateTransition);
         } else {
-          // 3. Shockwave Burst & Transition to Scene 5
           triggerBurst();
           playHarmonicChord();
 
